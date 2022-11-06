@@ -131,6 +131,91 @@ export default function invariant(condition, format, a, b, c, d, e, f) {
 }
 ```
 
+### ReactFiberWorkLoop报错
+```bash
+Failed to compile ../src/react/packages/react-reconciler/src/ReactFiberWorkLoop.js
+Attempted import error: 'unstable_flushAllWithoutAsserting' is not exported from 'scheduler' (imported as 'Scheduler').
+```
+ **/src/react/packages/scheduler/index.js** 修改为
+```javascript
+'use strict';
+
+export * from './src/Scheduler';
+
+//添加以下
+
+export {
+unstable_flushAllWithoutAsserting,
+
+unstable_flushNumberOfYields,
+
+unstable_flushExpired,
+
+unstable_clearYields,
+
+unstable_flushUntilNextPaint,
+
+unstable_flushAll,
+
+unstable_yieldValue,
+
+unstable_advanceTime
+
+} from './src/SchedulerHostConfig.js';
+```
+**react/packages/scheduler/src/SchedulerHostConfig.js** 修改为
+```javascript
+// throw new Error('This module must be shimmed by a specific build.');
+
+// 添加以下
+
+export {
+unstable_flushAllWithoutAsserting,
+
+unstable_flushNumberOfYields,
+
+unstable_flushExpired,
+
+unstable_clearYields,
+
+unstable_flushUntilNextPaint,
+
+unstable_flushAll,
+
+unstable_yieldValue,
+
+unstable_advanceTime
+
+} from './forks/SchedulerHostConfig.mock.js';
+
+export {
+requestHostCallback,
+
+requestHostTimeout,
+
+cancelHostTimeout,
+
+shouldYieldToHost,
+
+getCurrentTime,
+
+forceFrameRate,
+
+requestPaint
+
+} from './forks/SchedulerHostConfig.default.js';
+```
+
+### __VARIANT__报错
+```bash
+SchedulerFeatureFlags.js:11 Uncaught ReferenceError: __VARIANT__ is not defined at Module../src/react/packages/scheduler/src/SchedulerFeatureFlags.js
+```
+在src/react/packages/scheduler/src/SchedulerFeatureFlags.js文件中:
+```diff
+- export const enableProfiling = __VARIANT__;
++ export const enableProfiling = true;
+```
+
 ### 解决 eslint 报错
 还剩下一堆有关 eslint 的报错
 eslint 报错的内容实在太多了，我这里直接简单粗暴的将 webpack 中 eslint 插件给关掉，修改 **src/config/webpack.config.js** 文件：
