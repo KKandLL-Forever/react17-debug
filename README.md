@@ -1,4 +1,5 @@
 # Getting Started
+`npm install`
 `npm start`
 
 # 如何搭建一个 react 源码的调试环境
